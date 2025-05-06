@@ -4,11 +4,13 @@ import sys
 from dotenv import load_dotenv, dotenv_values
 import os 
 
-from aiogram import Bot, Dispatcher, html
+from aiogram import Bot, Router, Dispatcher, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
+
+from message_router import message_router
 
 
 load_dotenv()
@@ -16,27 +18,19 @@ TOKEN = os.getenv("SALAD_BOT_TOKEN")
 
 
 dp = Dispatcher()
-
+dp.include_router(message_router)
 
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
-    """
-    This handler receives messages with `/start` command
-    """
     await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!")
 
 
-@dp.message()
-async def echo_handler(message: Message) -> None:
-    """
-    Handler will forward receive a message back to the sender
-
-    By default, message handler will handle all message types (like a text, photo, sticker etc.)
-    """
-    try:
-        await message.send_copy(chat_id=message.chat.id)
-    except TypeError:
-        await message.answer("Nice try!")
+# @dp.message()
+# async def echo_handler(message: Message) -> None:
+#     try:
+#         await message.send_copy(chat_id=message.chat.id)
+#     except TypeError:
+#         await message.answer("Nice try!")
 
 
 async def main() -> None:
